@@ -65,7 +65,7 @@ __Shader Library__: Core RP Library contains a minimalistic Shader Library writt
 
 So for this lesson, let's get started by creating a `CustomRenderPipelineAsset01` and `CustomRenderPipeline01`. Here's how you do it:
 
-```
+```csharp
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -100,7 +100,7 @@ The `CustomRenderPipeline01` implements the `Render` method that is called by Un
 
 Now let's make our render pipeline clear the screen to _black_.
 
-```
+```csharp
  protected override void Render(ScriptableRenderContext context, Camera[] cameras)
  {
     CommandBuffer cmd = CommandBufferPool.Get();

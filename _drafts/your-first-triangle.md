@@ -30,7 +30,7 @@ For simplicity in this tutorial we will only cover the vertex, fragment and draw
 
 So let's start with shaders! In Unity you can create a shader file by clicking on `Asset -> Create -> Shader -> Unlit Shader`. Sadly this is not a good shader template but it's the most simple one.
 
-```
+```csharp
 Shader "LearnSRP/Triangle"
 {
     SubShader
@@ -71,25 +71,25 @@ Shader "LearnSRP/Triangle"
 ```
 
 Unity uses hlsl and a custom syntax called ShaderLab to make add further information to shaders. 
-```
+```csharp
 Shader "LearnSRP/Triangle"
 ```
 
 This line gives a name to this shader that we can search for and use to assign to materials.
 
-```
+```csharp
 Subshader {
 ```
 
 Every shader has to be in a Subshader block. We will skip talking about Subshaders for now.
 
-```
+```csharp
 Pass {
 ```
 
 Every vertex and fragment shader must be in a pass block. A shader can have multiple passes. For now we only need one pass to draw the triangle.
 
-```
+```csharp
 HLSLPROGRAM
 #pragma vertex vert
 #pragma fragment frag
@@ -99,7 +99,7 @@ ENDHLSL
 
 Here we start actual HLSL code. We tell the vertex program is implemented in a function called `vert` and the fragment program in a function called `fragment`.
 
-```
+```csharp
 struct Attributes
 {
     float4 positionOS : POSITION;
@@ -117,7 +117,7 @@ Here we declare that this shader is taking mesh that contains position attribute
 Then we declare the `Varyings` struct to hold pixel shader semantics. The vertex shader writes to the fields in Varyings, the rasterizer interpolates them and given them as input to the fragment shader. Similarly to the vertex semantics, the fragment must have [semantics as well](https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-semantics#pixel-shader-semantics).
 
 Our vertex shader is very simple:
-```
+```csharp
 Attributes vert (Attributes IN)
 {
     Varyings OUT;
@@ -130,7 +130,7 @@ It basically assigns the vertex position (Object Space) to the output position i
 
 Finally the fragment shader output a white color to the render target. The [SV_Target semantic](https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-semantics#system-value-semantics) tells it to write to whatever color buffer is bind as render target. 
 
-```
+```csharp
 half4 frag (Varyings IN) : SV_Target
 {
     return half4(1.0, 1.0, 1.0, 1.0);
@@ -139,7 +139,7 @@ half4 frag (Varyings IN) : SV_Target
 
 Now let's switch back to our render pipeline and learn how to do a __drawcall__.
 
-```
+```csharp
 public class CustomRenderPipeline01 : RenderPipeline
 {
     Material triangleMaterial;
@@ -150,7 +150,7 @@ Let's first declare a __Mesh__ to hold our triangle data and a __Material__ to h
 
 In the render pipeline constructor we will create a shader and assign it to our material.
 
-```
+```csharp
 Shader shader = Shader.Find("LearnSRP/01/TriangleShader");
 triangleMaterial = CoreUtils.CreateEngineMaterial(shader);
 ```            
@@ -165,7 +165,7 @@ In short, it's a normalized space with x and y in the range of [-1, 1] and z in 
 
 So let's create our vertex position to have a triangle in the center.
 
-```
+```csharp
 Vector3[] vertices =
 {
     // bottom-left corner
@@ -181,12 +181,12 @@ Vector3[] vertices =
 
 We need to also tell how these vertices form a triangle. We do this by creating a index buffer that references our vertices. Every three consective indices in this buffer form a triangle.
 
-```
+```csharp
 ushort[] indices = { 0, 1, 2 };
 ```
 
 We now create a mesh, set the vertices and index buffer and upload submit the mesh data to GPU.
-```
+```csharp
 triangleMesh = new Mesh();
 triangleMesh.SetVertices(vertices);
 triangleMesh.SetColors(colors);
@@ -196,7 +196,7 @@ triangleMesh.UploadMeshData(true);
 
 Because we are creating some resources, we need to make sure we also dispose them. The render pipeline implements the `IDisposable` interface. We can them implement the `Dispose` to release our resources.
 
-```
+```csharp
 protected override void Dispose(bool disposing)
 {
     base.Dispose(disposing);
@@ -211,7 +211,7 @@ protected override void Dispose(bool disposing)
 Now that we have the mesh and shader data created all that we have to do is issue the draw call. 
 In our `Render` method let's add `DrawMesh` just before executing the command buffer.
 
-```
+```csharp
 cmd.ClearRenderTarget(true, true, Color.black);
 cmd.DrawMesh(triangleMesh, Matrix4x4.identity, triangleMaterial, 0, 0);
 context.ExecuteCommandBuffer(cmd);
@@ -221,7 +221,7 @@ If you switch back to Unity and open the __Game View__ you should see a boring w
 
 In our render pipeline constructor, let's create a color attribute buffer.
 
-```
+```csharp
 Color[] colors =
 {
     new Color(1.0f, 0.0f, 0.0f, 1.0f),
@@ -232,7 +232,7 @@ Color[] colors =
 
 and set it to our mesh like following:
 
-```
+```csharp
 triangleMesh.SetVertices(vertices);
 triangleMesh.SetColors(colors);
 triangleMesh.SetIndices(indices, MeshTopology.Triangles, 0);
@@ -240,7 +240,7 @@ triangleMesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
 Finally we have to tell our shader to use this data:
 In __Attributes__ let's add our new color buffer:
-```
+```csharp
 struct Attributes
 {
     float4 positionOS : POSITION;
@@ -249,7 +249,7 @@ struct Attributes
 
 We also add in __Varyings__ because we want to have the rasterizer interpolate these color values and generate a nice degrade per-pixel.
 
-```
+```csharp
 struct Varyings
 {
     float4 positionHCS : SV_POSITION;
@@ -258,7 +258,7 @@ struct Varyings
 
 Finally we change our vertex and fragment shader to output the color:
 
-```
+```csharp
 Varyings vert (Attributes IN)
 {
     Varyings OUT;
@@ -285,7 +285,7 @@ How to render a quad? We render 2 triangles!
 
 Let's change our vertex attributes to do it.
 
-```
+```csharp
 Vector3[] vertices =
 {
     // bottom-left corner
