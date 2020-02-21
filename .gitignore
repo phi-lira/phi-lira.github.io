@@ -1,0 +1,16 @@
+# general ignore
+*.sln
+Library/
+Temp/
+.vs/
+*.csproj
+obj/
+
+# jekyll ignore
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
+
+
