@@ -1,1 +1,2 @@
 *.JPG filter=lfs diff=lfs merge=lfs -text
+bin/just-the-docs filter=lfs diff=lfs merge=lfs -text
