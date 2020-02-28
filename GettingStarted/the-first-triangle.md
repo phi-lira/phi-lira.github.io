@@ -13,9 +13,11 @@ In this lesson you will learn about the graphics pipeline and how to get a color
 
 If you look at a GPU as a black box system. It takes some data (meshes, materials, textures, shaders), processes drawing commands (`drawcalls`) in several pipelined stages and output pixels into a buffer (`render target`). Then some dedicated hardware reads this buffer and present the image on the screen. This is what is called a graphics pipeline. 
 
-In the very early days of GPUs, these pipeline stages were all fixed functions. In other words, they were not programmable. The increased demand for more content and more customization has driven the GPU vendors to expose programable stages in their pipeline. These stages are programable by the application with a specific type of program called `shader`. Graphics pipelines vary a lot from different types of GPUs. NVidia GPUs have pipelines with fewer stages that rely heavily on compute shaders. Mobile GPUs have deep pipeline stages that focus on cache locality when rendering triangles. These are known as tile based GPUs. You can read in more detail about graphics pipelins for different GPUs here, here and here.
+In the very early days of GPUs, these pipeline stages were all fixed functions. In other words, they were not programmable. The increased demand for more content and more customization has driven the GPU vendors to expose programable stages in their pipeline. These stages are programable by the application with a specific type of program called `shader`. Despite several parts of the graphics pipeline being programable, there are still some stages that are only configurable or not configurable at all. 
 
-For this lesson, we will focus on explaining some common pipeline stages used in most GPUs. For simplicity we are skipping a few fixed and programable stages. In our graphics pipeline, for each drawcall, these stages are executed:
+Graphics pipelines vary a lot from different types of GPUs. NVidia GPUs have pipelines with fewer stages that rely heavily on compute shaders. Mobile GPUs have deep pipeline stages that focus on cache locality when rendering triangles. These are known as tile based GPUs. You can read in more detail about graphics pipelines for different GPUs here, here and here.
+
+For this lesson, we will focus on explaining some common pipeline stages used in most GPUs. For each drawcall, these stages are executed:
 
 __Vertex Shader__: Receives as input vertex attributes (position, uv, color, normal). Processes each vertex, transforming their position from a local coordinate system (object space) to a coordinate system that can be easily mapped to screen (homogeneous clipping space). The other attributes can be either processed in some way or passed as is to next stage.
 
@@ -280,69 +282,20 @@ half4 frag (Varyings IN) : SV_Target
 }
 ```
 
-Now if you switch back to Unity you should see this colorful triangle. Why do we get smooth color degrade here?
+Now if you switch back to Unity you should see this colorful triangle. The reason we get a smooth color degrade is because the rasterizer is generating fragment color attribute by interpolating the vertex color attribute.
 
 I hope you are as excited as me to draw you first triangle. This is the very foundation work to get your feet wet on Computer Graphics, after all, it's all about triangles and pixels.
 
-Or maybe you are still wondering. Well, this is nice but how is learning to draw a mesh useful for me? Turns out that we can easily extend this triangle to render a full screen quad and this is the very foundation work for post-processing. :)
-
-How to render a quad? We render 2 triangles!
-
 [image]
 
-Let's change our vertex attributes to do it.
+## What If I got lost?
+You can check the final scripts and project in this github. Open the project and you will find all scripts and the Unity scene in the folder `02`. 
 
-```csharp
-Vector3[] vertices =
-{
-    // bottom-left corner
-    new Vector3(-1.0f, -1.0f, 0.0f),
-
-    // top corner
-    new Vector3(-1.0f, 1.0f, 0.0f),
-
-    // bottom right corner
-    new Vector3(1.0f, -1.0f, 0.0f),
-
-    // top right corner
-    new Vector3(1.0f, 1.0f, 0.0f),
-};
-
-Color[] colors =
-{
-    new Color(1.0f, 0.0f, 0.0f, 1.0f),
-    new Color(0.0f, 1.0f, 0.0f, 1.0f),
-    new Color(0.0f, 0.0f, 1.0f, 1.0f),
-    new Color(1.0f, 1.0f, 1.0f, 1.0f),
-};
-
-ushort[] indices = { 0, 1, 2, 2, 1, 3 };
-```
-
-And that's all we need to do.
+## Exercise:
+You might be wondering why learning about how to draw a triangle or procedural mesh is useful in anyway? This is important foundation work for post-processing. You can extend our triangle to draw a fullscreen quad. I'll leave this as exercise.
+Hint: You can render a quad by drawing two triangles.
 
 ## What's Next?
 If you look at __Game View__ now your triangle should be nicely on screen. In __Scene View__ not so much. This is because we need to set some draw call data to position our triangle in the correct coordinate system based on it's position in the world and the position and projection of the camera.
 
 We will learn how to render objects and change the vertex shader to position them correctly for each camera.
-
-## What If I got lost?
-You can check the final scripts and project in this github. Open the project and you will find all scripts and the Unity scene in the folder `02`.
-
-## Exercise01:
-When we created our material, we used `Shader.Find()` to search for a shader in project. However if we just try to build the scene to a standalone player our shader will not be included in the build. This is because Unity track the game dependencies by detecting all assets in the scenes and project we build. The shader is only reference in script and therefore is not automatically included. 
-
-You can change this by adding a public field in the pipeline asset to hold the `triangleMaterial`. Because our pipeline asset is included in the build and it references the material, the material is now also included in the build. Including required resources for your rende render pipeline asset is a good practice. 
-
-## Exercise02:
-A very common technique to draw full screen geometry is to use a triangle instead of a quad. This is more efficient as it allows to avoid setting up vertex and index buffers for mesh. 
-How to do it? You can use [CommandBuffer.DrawProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html) and have a shader with [SV_VertexID semantic in HLSL as decribed in presentation](https://www.slideshare.net/DevCentralAMD/vertex-shader-tricks-bill-bilodeau)
-
-If you get lost and need a reference implementation you can check mine here.
-
-
-
-
-
-
-

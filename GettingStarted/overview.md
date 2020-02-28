@@ -41,17 +41,17 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [CreateAssetMenu]
-public class CustomRenderPipelineAsset01 : RenderPipelineAsset
+public class CustomRenderPipelineAsset : RenderPipelineAsset
 {
     protected override RenderPipeline CreatePipeline()
     {
-        return new CustomRenderPipeline01(this);
+        return new CustomRenderPipeline(this);
     }
 }
 ```
 
 ```csharp
-public class CustomRenderPipeline01 : RenderPipeline
+public class CustomRenderPipeline : RenderPipeline
 {
     public CustomRenderPipeline01(CustomRenderPipelineAsset01 asset)
     {
@@ -65,11 +65,11 @@ public class CustomRenderPipeline01 : RenderPipeline
 }
 ```
 
-For now our `CustomRenderPipelineAsset01` is very straight forward. We subclass from `RenderPipelineAsset` and implement the `CreatePipeline` method that creates the render pipeline. `CreatePipeline` is called by Unity to create the pipeline instance before rendering if necessary.
+For now our `CustomRenderPipelineAsset` is very straight forward. We subclass from `RenderPipelineAsset` and implement the `CreatePipeline` method that creates the render pipeline. `CreatePipeline` is called by Unity to create the pipeline instance before rendering if necessary.
 
 The __[CreateAssetMenu]__ is property that tells Uniyt to create a menu in __Assets -> Create__. 
 
-The `CustomRenderPipeline01` implements the `Render` callnack that is called by Unity to render cameras. This callback is called once for all game cameras and then again for each Scene View, Preview and Reflection Probe camera. 
+The `CustomRenderPipeline` implements the `Render` callnack that is called by Unity to render cameras. This callback is called once for all game cameras and then again for each Scene View, Preview and Reflection Probe camera. 
 
 Now let's make our render pipeline clear the screen to _black_.
 
@@ -98,8 +98,6 @@ NOTE: Add info about __main thread__ and __render thread__.
 
 You can call `Submit` once or multiple times in a frame. It depends on the amount of workload you have. Calling `Submit` early in the pipeline can help to have a better parallelism of __main thread__ and __render thread__.
 
-Now switch back to Unity. Once all scripts are compiled you should be able to see a menu in 
-
 Switch back to Unity and wait until scripts are compiled.Now you can click on `Assets -> Create -> CustomRenderPipelineAsset01`. 
 ![Create]({{ site.url }}/assets/images/create.png)
 
@@ -114,15 +112,19 @@ This will create a pipeline asset in your project folder. Assign the asset in Gr
 
 ![Graphics Settings]({{ site.url }}/assets/images//graphicssettings.JPG)
 
-Your game and scene view should should look just be a black image now. There you are! You've create your own first (and very effient) renderer.
+Your game and scene view should should look just be a black image now. 
 
-You will notice that now your game and scene view, and even previews are black. This is because when you override Unity with a custom render pipeline you are not only overriding the game camera but every camera type that is used to render in Unity. Scene, Game, Preview, even reflection probes will be replaced by your custom rendering.
+You will notice that now your game and scene view, and even previews are black. This is because when you override Unity with a custom render pipeline you are not only overriding just the game camera but every camera type that is used to render in Unity. Scene, Game, Preview, even reflection probes will be replaced by your custom rendering.
 
-## What's next?
-For the next lesson we will learn about how to create shaders and draw your first triangle.
+There you are! You've create your own first (and very effient) renderer.
 
 ## What If I got lost?
 You can check the final scripts and project in this [github](https://github.com/phi-lira/learnsrp). Open the project and you will find all scripts and the Unity scene in the folder `01`.
 
+## Exercise
+In the `Render` callback we receive a list of cameras.
+Change our render pipeline to loop through all cameras and clear the screen with the camera background color.
 
+## What's next?
+For the next lesson we will learn about how to create shaders and draw your first triangle.
 
