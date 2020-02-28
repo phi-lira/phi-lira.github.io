@@ -1,8 +1,9 @@
 ---
-layout: post
-title:  "Enter SRP"
-nav_order: 2
-description: ""
+layout: default
+title:  Overview
+nav_order: 3
+description: 
+parent: Getting Started
 ---
 
 ## SRP Overview

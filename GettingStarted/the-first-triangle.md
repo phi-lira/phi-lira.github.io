@@ -1,32 +1,39 @@
 ---
-layout: post
-title:  "The first triangle"
-date:   2020-02-16 19:43:31 +0100
-categories: 
+layout: default
+title:  The first triangle
+nav_order: 4
+parent: Getting Started
 ---
 
 # The first triangle
 
-In the previous lesson we learned the basics of render pipeline. How to override Unity rendering and clear the screen to black. 
+In the previous lesson we learned how to override Unity rendering and clear the screen to black. 
 
 In this lesson you will learn about the graphics pipeline and how to get a colorful triangle on screen. In order to learn about how to render a triangle let's take a brief look at how a GPU renders it. 
 
 If you look at a GPU as a black box system. It takes some data (meshes, materials, textures, shaders), processes drawing commands (`drawcalls`) in several pipelined stages and output pixels into a buffer (`render target`). Then some dedicated hardware reads this buffer and present the image on the screen. This is what is called a graphics pipeline. 
 
-In the very early days of GPUs, these pipeline stages were all fixed function. In other words, they were not programmable. The increased demand for more content and more customization has driven the GPU vendors to expose programable stages in their pipeline. These stages are programable by the application with a specific type of program called `shader`. You can read in more detail about graphics pipelins for different GPUs here, here and here.
+In the very early days of GPUs, these pipeline stages were all fixed functions. In other words, they were not programmable. The increased demand for more content and more customization has driven the GPU vendors to expose programable stages in their pipeline. These stages are programable by the application with a specific type of program called `shader`. Graphics pipelines vary a lot from different types of GPUs. NVidia GPUs have pipelines with fewer stages that rely heavily on compute shaders. Mobile GPUs have deep pipeline stages that focus on cache locality when rendering triangles. These are known as tile based GPUs. You can read in more detail about graphics pipelins for different GPUs here, here and here.
 
-Here's a picture of the main stages of a graphics pipeline. For each drawcall this is what happens:
+For this lesson, we will focus on explaining some common pipeline stages used in most GPUs. For simplicity we are skipping a few fixed and programable stages. In our graphics pipeline, for each drawcall, these stages are executed:
 
 __Vertex Shader__: Receives as input vertex attributes (position, uv, color, normal). Processes each vertex, transforming their position from a local coordinate system (object space) to a coordinate system that can be easily mapped to screen (homogeneous clipping space). The other attributes can be either processed in some way or passed as is to next stage.
 
+__Primitive Assembly__: Creates topology information by assembling how vertices form polygons. In majority of cases, triangles are used a primitive and every three consecutive vertices forms a triangle.
 
-__Rasterization__: Receives the processed vertex attributes and interpolates the values to generate values for each fragment. Optionally, this stage can know in some situations if the fragment is visible and don't dispatch any work for them in this case.
+__Rasterization__: Receives the processed vertex attributes and interpolates the values to generate attributes for each fragment. Optionally, this stage can know in some situations if the fragment is visible and don't dispatch any work for them in this case.
+
 __Fragment Shader__: Receives the fragment attributes and outputs a color for each each one. This is usually where the most intense work happens. The fragment shader can use uvs to sample texture maps and use normals to compute lighting.
-__Output Merger__: Receives the fragment color and can apply further logic to decide how to write this color to the render target. This is where blend modes can be setup to achieve transparency.
 
-In short, if we want to draw a triangle have to: write a vertex and a fragment shader. Set up some data for a draw call. Issue a draw call with vertex attributes. Configure some render state that tells fixed parts of the pipeline (rasterizer and output merged) what to do with fragments.
+__Output Merger__: Receives the fragment color and applies further logic to decide how to write this color to the render target. This is where blend modes can be setup to achieve transparency.
 
-For simplicity in this tutorial we will only cover the vertex, fragment and drawcalss parts. We will introduce configuring drawcall data and render state in next tutorials. 
+In short, if we want to draw a triangle we have to:
+1. Write a vertex and a fragment shader.
+2. Optionally setup shader input data.
+3. Issue a draw call command that tells the pipeline the vertex attributes and the primitive type.
+4. Configure render state that tells fixed parts of the pipeline (rasterizer and output merged) to perform operations with fragments.
+
+For simplicity in this lesson we will only cover the creation of vertex, fragment and drawcalls parts. We will introduce configuring drawcall data and render state in next lesson. 
 
 So let's start with shaders! In Unity you can create a shader file by clicking on `Asset -> Create -> Shader -> Unlit Shader`. Sadly this is not a good shader template but it's the most simple one.
 

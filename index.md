@@ -22,10 +22,9 @@ If you are a student, you can use SRP to learn about Computer Graphics rendering
 
 If you are a professional you can create highly customizable production pipeline for your game or application. 
 
-
 ## About the author
 
-Felipe Lira is a Graphics Programmer at Unity Technologies. He joined Unity in 2016 to work on SRP technology and he now leads the development of the [Universal Render Pipeline](https://unity.com/srp/universal-render-pipeline), a robust and optimized renderer that supports several platforms. 
+[Felipe Lira](https://www.linkedin.com/in/philira/) is a Graphics Programmer at Unity Technologies. He joined Unity in 2016 to work on SRP technology and he now leads the development of the [Universal Render Pipeline](https://unity.com/srp/universal-render-pipeline), a robust and optimized renderer that supports several platforms. 
 
 ---
 
